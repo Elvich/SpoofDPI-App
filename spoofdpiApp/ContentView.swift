@@ -1,59 +1,56 @@
-//
-//  ContentView.swift
-//  spoofdpiApp
-//
-//  Created by Maksim Gritsuk on 30.11.2025.
-//
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @ObservedObject var manager: SpoofDPIManager
+    @Environment(\.openWindow) private var openWindow
+    
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        ZStack(alignment: .center) {
+            BackgroundView()
+            
+            VStack(spacing: 20) {
+                Spacer()
+                
+                HStack {
+                    Toggle("", isOn: $manager.isRunning)
+                        .toggleStyle(CustomToggleStyle())
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
+                
+                Text(manager.isRunning ? "Click to turn it off" : "Click to turn it on")
+                    .font(.caption)
+                
+                Spacer()
             }
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
             .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                ToolbarItem(placement: .automatic) {
+                    Button("Settings", systemImage: "gear") {
+                        openWindow(id: "settings")
                     }
+                    
                 }
             }
-        } detail: {
-            Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+        .onChange(of: manager.error) { _, newError in
+            if let newError = newError {
+                errorMessage = newError
+                showErrorAlert = true
             }
         }
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK") {
+                manager.error = nil
+            }
+        } message: {
+            Text(errorMessage)
+        }
     }
+    
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    ContentView(manager: SpoofDPIManager())
 }
