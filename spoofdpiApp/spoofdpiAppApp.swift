@@ -40,7 +40,7 @@ struct spoofdpiAppApp: App {
         .windowResizability(.contentSize)
 
         MenuBarExtra("", systemImage: isOn ? "network" : "network.slash") {
-            Button(isOn ? "Stop" :"Start") {
+            Button(isOn ? "Stop" : "Start") {
                 if isOn {
                     manager.stopProxy()
                 } else {

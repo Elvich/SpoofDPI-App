@@ -54,6 +54,14 @@ final class SpoofDPIManager: ObservableObject {
     init() {
         checkInstallation()
         isOn = _isRunning
+        
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            self.stopProxy()
+        }
     }
 
     private func checkInstallation() {
