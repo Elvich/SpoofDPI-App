@@ -11,7 +11,7 @@ final class SpoofDPIManager: ObservableObject {
     
     // MARK: - Constants
     private let appName = "SpoofDPI-Wrapper"
-    private let binaryName = "spoofdpi"
+    private let binaryName = "spoofdpi-terminal"
 
     // MARK: - Paths (без standardizedFileURL!)
     private var appSupportDir: URL {
@@ -92,11 +92,11 @@ final class SpoofDPIManager: ObservableObject {
     private func installFromBundle() -> Bool {
         guard
             let bundled = Bundle.main.url(
-                forResource: "spoofdpi",
+                forResource: "spoofdpi-terminal",
                 withExtension: nil
             )
         else {
-            print("❌ Бинарник 'spoofdpi' не найден в Resources!")
+            print("❌ Бинарник 'spoofdpi-terminal' не найден в Resources!")
             return false
         }
 
